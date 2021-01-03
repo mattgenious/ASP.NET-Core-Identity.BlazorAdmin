@@ -4,8 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # Settings so as to no accidentally expose login info for databases and stuff :sweat_smile:
-*appsettings.Development.json
-*appsettings.Production.json
+**/appsettings*.json
 
 # User-specific files
 *.rsuser

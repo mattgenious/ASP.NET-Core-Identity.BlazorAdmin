@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
-namespace IdentityManagerUI.Models
+namespace ASP.NET_Core_Identity.BlazorAdmin.Data
 {
     public class ApplicationUser : IdentityUser
     {

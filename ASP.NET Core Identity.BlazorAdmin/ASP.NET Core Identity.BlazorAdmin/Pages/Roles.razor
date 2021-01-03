@@ -1,7 +1,48 @@
 ﻿@page "/roles"
 
-<h1>Hello, world!</h1>
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using ASP.NET_Core_Identity.BlazorAdmin.Data
 
-Welcome to your new app.
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Roles</h1>
+        </div>
+    </div>
+    @if (applicationRoles != null)
+    {
+        <div class="row">
+            <div class="col">
+                <DataGrid TItem="ApplicationRole"
+                          Data="@applicationRoles"
+                          TotalItems="@applicationRoles.Count"
+                          ShowPager="true"
+                          PageSize="30"
+                          Filterable="true"
+                          Responsive="true"
+                          Bordered="true">
+                    <DataGridColumn TItem="ApplicationRole" Field="@nameof(ApplicationRole.Id)" Caption="Id"/>
+                    <DataGridColumn TItem="ApplicationRole" Field="@nameof(ApplicationRole.Name)" Caption="Name"/>
+                </DataGrid>
+            </div>
+        </div>
+    }
+</div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+
+@code
+{
+    [Inject]
+    RoleManager<ApplicationRole> RoleManager { get; set; }
+
+    [Inject]
+    NavigationManager Navigation { get; set; }
+
+    List<ApplicationRole> applicationRoles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        applicationRoles = await RoleManager.Roles.Include(x => x.Claims).ToListAsync().ConfigureAwait(false);
+    }
+}

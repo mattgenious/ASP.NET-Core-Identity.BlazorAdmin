@@ -1,15 +1,42 @@
 ﻿@page "/users"
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
-@using IdentityManagerUI.Models
+@using ASP.NET_Core_Identity.BlazorAdmin.Data
 
-<h1>Users</h1>
-
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Users</h1>
+        </div>
+    </div>
+    @if (applicationUsers != null)
+    {
+        <div class="row">
+            <div class="col">
+                <DataGrid TItem="ApplicationUser"
+                          Data="@applicationUsers"
+                          TotalItems="@applicationUsers.Count"
+                          ShowPager="true"
+                          PageSize="30"
+                          Filterable="true"
+                          Responsive="true"
+                          Bordered="true">
+                    <DataGridColumn TItem="ApplicationUser" Field="@nameof(ApplicationUser.Id)" Caption="Id"/>
+                    <DataGridColumn TItem="ApplicationUser" Field="@nameof(ApplicationUser.Email)" Caption="Email"/>
+                </DataGrid>
+            </div>
+        </div>
+    }
+</div>
 
 
 @code
 {
-    [Inject] UserManager<ApplicationUser> UserManager { get; set; }
+    [Inject]
+    UserManager<ApplicationUser> UserManager { get; set; }
+
+    [Inject]
+    NavigationManager Navigation { get; set; }
 
     List<ApplicationUser> applicationUsers;
 

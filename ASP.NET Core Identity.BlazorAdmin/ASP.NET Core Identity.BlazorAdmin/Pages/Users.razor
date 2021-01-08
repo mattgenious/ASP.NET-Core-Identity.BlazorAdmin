@@ -1,6 +1,8 @@
 ﻿@page "/users"
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity.EntityFrameworkCore
 @using Microsoft.EntityFrameworkCore
+@attribute [Authorize]
 
 <div class="container">
     <div class="row">
@@ -8,24 +10,57 @@
             <h1>Users</h1>
         </div>
     </div>
-    @if (applicationUsers != null)
+    @if (identityUsers != null)
     {
         <div class="row">
             <div class="col">
                 <DataGrid TItem="IdentityUser"
-                          Data="@applicationUsers"
-                          TotalItems="@applicationUsers.Count"
+                          Data="@identityUsers"
+                          TotalItems="@identityUsers.Count"
                           ShowPager="true"
                           PageSize="30"
                           Filterable="true"
                           Responsive="true"
-                          Bordered="true">
-                    <DataGridColumn TItem="IdentityUser" Field="@nameof(IdentityUser.Id)" Caption="Id"/>
-                    <DataGridColumn TItem="IdentityUser" Field="@nameof(IdentityUser.Email)" Caption="Email"/>
+                          Bordered="true"
+                          Editable="true"
+                          EditMode="DataGridEditMode.Popup"
+                          SelectedRowChanged="SelectUserAndLoadClaims"
+                          SelectedRow="@selectedIdentityUser">
+                    <DataGridCommandColumn TItem="IdentityUser"/>
+                    <DataGridColumn TItem="IdentityUser" Field="@nameof(IdentityUser.Id)" Caption="Id" Editable="false" Filterable="false"/>
+                    <DataGridColumn TItem="IdentityUser" Field="@nameof(IdentityUser.Email)" Caption="Email" Editable="true"/>
                 </DataGrid>
             </div>
         </div>
     }
+    @if (selectedIdentityUserClaims != null)
+    {
+        <div class="row">
+            <div class="col">
+                <DataGrid TItem="IdentityUserClaim<string>"
+                          Data="@selectedIdentityUserClaims"
+                          TotalItems="@selectedIdentityUserClaims.Count"
+                          ShowPager="true"
+                          PageSize="30"
+                          Filterable="true"
+                          Responsive="true"
+                          Bordered="true"
+                          Editable="true"
+                          EditMode="DataGridEditMode.Popup"
+                          NewItemDefaultSetter="(x) => x.UserId = selectedIdentityUser.Id"
+                          RowRemoved="x => IdentityDbContext.Remove(x)">
+                    <DataGridCommandColumn TItem="IdentityUserClaim<string>"/>
+                    <DataGridColumn TItem="IdentityUserClaim<string>" Field="@nameof(IdentityUserClaim<string>.ClaimType)" Caption="Type" Editable="true"/>
+                    <DataGridColumn TItem="IdentityUserClaim<string>" Field="@nameof(IdentityUserClaim<string>.ClaimValue)" Caption="Value" Editable="true"/>
+                </DataGrid>
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="col">
+            <Button Color="Color.Success" Clicked="() => SaveChanges()">Save</Button>
+        </div>
+    </div>
 </div>
 
 
@@ -35,12 +70,32 @@
     UserManager<IdentityUser> UserManager { get; set; }
 
     [Inject]
+    IdentityDbContext IdentityDbContext { get; set; }
+
+    [Inject]
     NavigationManager Navigation { get; set; }
 
-    List<IdentityUser> applicationUsers;
+    List<IdentityUser> identityUsers;
+
+    IdentityUser selectedIdentityUser;
+    IList<IdentityUserClaim<string>> selectedIdentityUserClaims;
 
     protected override async Task OnInitializedAsync()
     {
-        applicationUsers = await UserManager.Users.ToListAsync().ConfigureAwait(false);
+        identityUsers = await UserManager.Users.ToListAsync().ConfigureAwait(false);
+    }
+
+
+    private async Task SelectUserAndLoadClaims(IdentityUser user)
+    {
+        selectedIdentityUser = user;
+        selectedIdentityUserClaims = await IdentityDbContext.UserClaims.Where(x => x.UserId == user.Id).ToListAsync().ConfigureAwait(false);
+    }
+
+    private int SaveChanges()
+    {
+        IdentityDbContext.UpdateRange(identityUsers);
+        IdentityDbContext.UpdateRange(selectedIdentityUserClaims);
+        return IdentityDbContext.SaveChanges();
     }
 }

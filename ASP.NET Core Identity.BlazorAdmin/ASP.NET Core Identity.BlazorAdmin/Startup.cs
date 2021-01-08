@@ -1,5 +1,4 @@
 using ASP.NET_Core_Identity.BlazorAdmin.Areas.Identity;
-using ASP.NET_Core_Identity.BlazorAdmin.Data;
 using Blazorise;
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,12 +27,12 @@ namespace ASP.NET_Core_Identity.BlazorAdmin
 		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddDbContext<ApplicationDbContext>(options =>
+			services.AddDbContext<IdentityDbContext>(options =>
 				options.UseNpgsql(
 					Configuration.GetConnectionString("DefaultConnection")));
-			services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-				.AddRoles<ApplicationRole>()
-				.AddEntityFrameworkStores<ApplicationDbContext>();
+			services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+				.AddRoles<IdentityRole>()
+				.AddEntityFrameworkStores<IdentityDbContext>();
 			services.AddRazorPages();
 			services.AddServerSideBlazor();
 			services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();

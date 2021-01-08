@@ -1,8 +1,7 @@
 ﻿@page
-@using ASP.NET_Core_Identity.BlazorAdmin.Data
 @using Microsoft.AspNetCore.Identity
 @attribute [IgnoreAntiforgeryToken]
-@inject SignInManager<ApplicationUser> SignInManager
+@inject SignInManager<IdentityUser> SignInManager
 @functions {
     public async Task<IActionResult> OnPost()
     {

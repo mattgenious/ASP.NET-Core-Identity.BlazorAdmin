@@ -2,7 +2,6 @@
 
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
-@using ASP.NET_Core_Identity.BlazorAdmin.Data
 
 <div class="container">
     <div class="row">
@@ -10,20 +9,20 @@
             <h1>Roles</h1>
         </div>
     </div>
-    @if (applicationRoles != null)
+    @if (identityRoles != null)
     {
         <div class="row">
             <div class="col">
-                <DataGrid TItem="ApplicationRole"
-                          Data="@applicationRoles"
-                          TotalItems="@applicationRoles.Count"
+                <DataGrid TItem="IdentityRole"
+                          Data="@identityRoles"
+                          TotalItems="@identityRoles.Count"
                           ShowPager="true"
                           PageSize="30"
                           Filterable="true"
                           Responsive="true"
                           Bordered="true">
-                    <DataGridColumn TItem="ApplicationRole" Field="@nameof(ApplicationRole.Id)" Caption="Id"/>
-                    <DataGridColumn TItem="ApplicationRole" Field="@nameof(ApplicationRole.Name)" Caption="Name"/>
+                    <DataGridColumn TItem="IdentityRole" Field="@nameof(IdentityRole.Id)" Caption="Id"/>
+                    <DataGridColumn TItem="IdentityRole" Field="@nameof(IdentityRole.Name)" Caption="Name"/>
                 </DataGrid>
             </div>
         </div>
@@ -34,15 +33,15 @@
 @code
 {
     [Inject]
-    RoleManager<ApplicationRole> RoleManager { get; set; }
+    RoleManager<IdentityRole> RoleManager { get; set; }
 
     [Inject]
     NavigationManager Navigation { get; set; }
 
-    List<ApplicationRole> applicationRoles;
+    List<IdentityRole> identityRoles;
 
     protected override async Task OnInitializedAsync()
     {
-        applicationRoles = await RoleManager.Roles.Include(x => x.Claims).ToListAsync().ConfigureAwait(false);
+        identityRoles = await RoleManager.Roles.ToListAsync().ConfigureAwait(false);
     }
 }
